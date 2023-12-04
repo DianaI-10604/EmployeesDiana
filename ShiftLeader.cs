@@ -12,7 +12,7 @@ namespace Сотрудники
         public double ShiftLeaderSalary = 108390;  //зарплата начальника дневной смены //изначально оклад
         private int OvertimeWork = 0;
         public double Bonus = 0;       //итоговая сумма премии
-        //private double BonusValue = 0; //сумма за каждого сотрудника (в %)
+        private double BonusValue = 0; //сумма за каждого сотрудника (в %)
 
         public ShiftLeader(string name, int age, int DepartmentNumber, int NightShiftsCount, int DayShiftsCount, int DayShiftsMin, int NightShiftsMin) : base(name, age, DepartmentNumber, NightShiftsCount, DayShiftsCount, DayShiftsMin, DayShiftsMin)
         { }
@@ -20,15 +20,15 @@ namespace Сотрудники
         {
             this.OvertimeWork = OvertimeWork;
         }
-        //public void Bonusvalue(double BonusValue) //закидываем в Main
-        //{
-        //    BonusValue = this.BonusValue;
-        //}
+        public void Bonusvalue(double BonusValue) //закидываем в Main
+        {
+            BonusValue = this.BonusValue;
+        }
         public void SalaryBonus(double Bonus) //закидываем отсюда туда
         {
             Bonus = this.Bonus;
         }
-        public double LeaderSalary(int OvertimeWork, out double BonusValue) //расчет заработной платы начальника смены
+        private double LeaderSalary(int OvertimeWork, out double BonusValue) //расчет заработной платы начальника смены
         {
             BonusValue = 0;
             BonusValue = BonusCheck(OvertimeWork, BonusValue);
@@ -52,20 +52,40 @@ namespace Сотрудники
             }
             return BonusValue;
         }
-        public double BonusCount(double BonusValue) //считаем бонус
+        private double BonusCount(double BonusValue) //считаем бонус
         {
             Bonus += ShiftLeaderSalary * BonusValue;
             return Bonus;
         }
-        public int DayOvertimeCount(int DayShiftsCount) //считаем сколько переработано ДНЕВНЫХ СМЕН
+        private int DayOvertimeCount(int DayShiftsCount) //считаем сколько переработано ДНЕВНЫХ СМЕН
         {
             OvertimeWork += DayShiftsCount - DayShiftsMin;
             return OvertimeWork;
         }
-        public int NightOvertimeCount(int NightShiftsCount) //переработка НОЧНЫХ СМЕН
+        private int NightOvertimeCount(int NightShiftsCount) //переработка НОЧНЫХ СМЕН
         {
             OvertimeWork += NightShiftsCount - NightShiftsMin;
             return OvertimeWork;
+        }
+        public void ShiftLeaderInfoFilling(ShiftLeader[] leaders, Employee[] people, int i) //заполняем информацию о начальниках смены
+        {
+            for (int j = 0; j < people.Length; j++)
+            {
+                if (people[j].DayShiftsCount > DayShiftsMin && i == 0) //если дневных смен больше обязательного минимума и рассматриваем начальника дневной смены
+                {
+                    OvertimeWork = leaders[i].DayOvertimeCount(people[j].DayShiftsCount);
+                }
+                else if (people[j].NightShiftsCount > DayShiftsMin && i == 1)
+                {
+                    OvertimeWork = leaders[i].NightOvertimeCount(people[j].NightShiftsCount);
+                }
+
+                leaders[i].TimeWork(OvertimeWork);
+                ShiftLeaderSalary = leaders[i].LeaderSalary(OvertimeWork, out BonusValue); //посчитали зарплату и сохранили
+
+                Bonus = leaders[i].BonusCount(BonusValue);  //посчитали размер бонуса за одного сотрудника
+                leaders[i].SalaryBonus(Bonus); //связали переменные разных класов (закинули)
+            }
         }
         public void LeadersInfoOutput() //выводим информацию о начальниках смены
         {

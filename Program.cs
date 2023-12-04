@@ -20,7 +20,7 @@ namespace Сотрудники
 
             Employee employee = new Employee("", 0, 0, 0, 0, 0, 0);
             ShiftLeader leader = new ShiftLeader("", 0, 0, 0, 0, 0, 0);
-            Employee[] people = new Employee[7];          //массив сотрудников
+            Employee[] people = new Employee[10];          //массив сотрудников
             ShiftLeader[] leaders = new ShiftLeader[2];   //массив начальников
 
             leader.ShiftsCount(DayShiftsMin, NightShiftsMin); //записали сюда значения из класса ShiftLeader
@@ -36,25 +36,10 @@ namespace Сотрудники
 
                 Console.Write("\tВведите возраст: ");       //должен быть от 16 до 50
                 age = Convert.ToInt32(Console.ReadLine());
-                while (age < 16 || age > 50)
-                {
-                    Console.WriteLine("Возраст не подходит, введите заново: ");
-                    age = Convert.ToInt32(Console.ReadLine());
-                }
+                age = age_check(age); //проверка на введенный возраст
 
-                if (i < 5) //если индекс меньше 5, то закидываем сотрудников в первый отдел
-                {
-                    DepartmentNumber = 1;                            //указали номер отдела
-                    people[i].EmployeeDepartment(DepartmentNumber);  //записали номер отдела
-                }
-                else
-                {
-                    DepartmentNumber = 2;
-                    people[i].EmployeeDepartment(DepartmentNumber);
-                }
-
+                people[i].Shifts(people, i, age); //заполнение смен + отдела
                 people[i].PersonInfo(name, age);   //записываем введенные значения в класс
-                people[i].Shifts(age);             //запускаем заполнение смен
 
                 Console.WriteLine();
             }
@@ -65,7 +50,7 @@ namespace Сотрудники
             for (int j = 0; j < people.Length; j++)  //вывод информации о всех сотрудниках
             {
                 Console.WriteLine($"Сотрудник {j + 1}");
-                people[j].EmployeeInfoOutput();
+                people[j].EmployeeInfoOutput();   //метод на вывод информации
 
                 Console.ReadKey();
                 Console.WriteLine();
@@ -75,41 +60,33 @@ namespace Сотрудники
             for (int i = 0; i < leaders.Length; i++)
             {
                 leaders[i] = new ShiftLeader("", 0, 0, 0, 0, 0, 0);
-
-                for (int j = 0; j < people.Length; j++)
-                {
-                    if (people[j].DayShiftsCount > DayShiftsMin && i == 0) //если дневных смен больше обязательного минимума и рассматриваем начальника дневной смены
-                    {
-                        OvertimeWork = leaders[i].DayOvertimeCount(people[j].DayShiftsCount);
-                    }
-                    else if (people[j].NightShiftsCount > DayShiftsMin && i == 1)
-                    {
-                        OvertimeWork = leaders[i].NightOvertimeCount(people[j].NightShiftsCount);
-                    }
-
-                    leaders[i].TimeWork(OvertimeWork);
-                    LeaderSalary = leaders[i].LeaderSalary(OvertimeWork, out BonusValue); //посчитали зарплату и сохранили
-
-                    Bonus = leaders[i].BonusCount(BonusValue);  //посчитали размер бонуса за одного сотрудника
-                    leaders[i].SalaryBonus(Bonus); //связали переменные разных класов (закинули)
-                }
+                leaders[i].ShiftLeaderInfoFilling(leaders, people, i); //заполнение информации о начальнике смены в классе
             }
 
             Console.Write("Нажмите любую клавишу, чтобы увидеть итоговую зарплату начальников каждой из смен: ");
             Console.ReadKey();
             Console.Clear();
 
-            Console.WriteLine("Информация о начальниках смен: ");
+            Console.WriteLine("Информация о начальниках смен: \n");
             for (int j = 0; j < leaders.Length; j++)  //вывод информации о всех сотрудниках
             {
                 Console.WriteLine($"Начальник смены {j + 1}");
-                leaders[j].LeadersInfoOutput();
+                leaders[j].LeadersInfoOutput();  //вывод информации о начальнике смены
 
-                Console.ReadKey();
                 Console.WriteLine();
             }
 
             Console.ReadKey();
+        }
+
+        static int age_check(int age)
+        {
+            while (age < 16 || age > 50)
+            {
+                Console.Write("Возраст сотрудников должен быть от 16 до 50. Введите другое значение: ");
+                age = Convert.ToInt32(Console.ReadLine());
+            }
+            return age;
         }
     }
 }

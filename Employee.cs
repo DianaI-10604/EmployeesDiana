@@ -21,7 +21,8 @@ namespace Сотрудники
 
         public Employee(string name, int age, int DepartmentNumber, int NightShiftsCount, int DayShiftsCount, int DayShiftsMin, int NightShiftsMin) : base(name, age) //наследуем значения от класса Person
         {
-            this.DepartmentNumber = DepartmentNumber;
+            this.DayShiftsCount = DayShiftsCount;
+            this.NightShiftsCount = NightShiftsCount;
         }
         public void ShiftsCount(int DayShiftsMin, int NightShiftsMin)  //перекидываем минимальные значения отсюда в Main
         {
@@ -33,11 +34,7 @@ namespace Сотрудники
             DayShiftsCount = this.DayShiftsCount;
             NightShiftsCount = this.NightShiftsCount;
         }
-        public void EmployeeDepartment(int DepartmentNumber) //номер смены и отдела сотрудника
-        {
-            this.DepartmentNumber = DepartmentNumber;
-        }
-        public void Shifts(int age) //заполнение смен
+        public void Shifts(Employee[] people, int i, int age) //заполнение смен
         {
             Random rnd = new Random();
             if (age < 18)  //если младше 18, то только дневные смены
@@ -49,12 +46,27 @@ namespace Сотрудники
                 NightShiftsCount = rnd.Next(20, 40);
                 DayShiftsCount = rnd.Next(20, 40);
             }
+
+            DepartmentInfo(people, i); //отдел
         }
+        private void DepartmentInfo(Employee[] people, int i)
+        {
+            if (i < 5) //если индекс меньше 5, то закидываем сотрудников в первый отдел
+            {
+                people[i].DepartmentNumber = 1;  //указали номер отдела                                                       
+            }
+            else
+            {
+                people[i].DepartmentNumber = 2;
+            }
+        }
+
         private double EmployeeSalary(double salary) //расчет заработной платы каждого сотрудника
         {
             salary = DayShiftCost * DayShiftsCount + NightShiftCost * NightShiftsCount; //стоимость ночных и дневных смен
             return salary;
         }
+
         public void EmployeeInfoOutput() //выводим информацию о сотрудниках
         {
             base.InfoOutput(); //имя и возраст
@@ -69,4 +81,3 @@ namespace Сотрудники
         }
     }
 }
-
